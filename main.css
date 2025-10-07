@@ -1,0 +1,120 @@
+/* =============================================================
+   assets/main.css
+   Estilos principales del "index madre" (Calculadoras Tiendamia)
+   Mantén este archivo en: Calculadoras_Tiendamia/assets/main.css
+   ============================================================= */
+
+/* === Variables y reset ligero === */
+:root{
+  --brand: #e30613;
+  --bg: #f5f5f5;
+  --card: #ffffff;
+  --text: #222;
+  --muted: #555;
+  --shadow: 0 6px 24px rgba(0,0,0,.06);
+}
+
+* { box-sizing: border-box; }
+html,body { height:100%; margin:0; padding:0; font-family: system-ui, -apple-system, "Segoe UI", Roboto,Arial, Helvetica, sans-serif; background: var(--bg); color:var(--text); }
+
+/* ===== Header ===== */
+.logo-top { position:absolute; top: 25px;; left:10px; height:40px; z-index:10; }
+.site-header {
+  background: var(--brand);
+  color: #fff;
+  padding: 18px 20px;
+  text-align:center;
+  font-weight:800;
+  letter-spacing:1px;
+  font-size: 2rem;
+  font-weight: 900;
+  letter-spacing: 0.3px;
+}
+
+/* ===== Tabs (barra superior) ===== */
+.tabs {
+  display:flex;
+  gap:6px;
+  justify-content:center;
+  background: #fff;
+  border-bottom: 1px solid #e6e6e6;
+  padding: 10px;
+  position: sticky;
+  top: 68px; /* deja sitio al header */
+  z-index: 9;
+}
+
+.tab {
+  background: transparent;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px 8px 0 0;
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--muted);
+  transition: color .12s, background .12s, transform .06s;
+}
+
+.tab:hover { color: var(--brand); transform: translateY(-1px); }
+.tab.active { color: var(--brand); border-bottom: 3px solid var(--brand); background: #fff; }
+.tab.disabled { opacity: .5; cursor: not-allowed; }
+
+/* ===== Contenedor principal / iframe ===== */
+.main-area {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+
+/* iframe limpio - altura gestionada por main.js */
+iframe#calcFrame {
+  width: 100%;
+  max-width: 1000px;
+  height: auto;       /* el valor real lo establece main.js */
+  min-height: 420px;  /* seguridad mínima */
+  border: none;
+  background: transparent;
+  display: block;
+}
+
+
+/* Responsive extra: en pantallas pequeñas */
+@media (max-width: 900px){
+  iframe#calcFrame {
+    max-width: 95%;
+    height: 85vh;
+  }
+}
+
+/* ===== Footer y logos ===== */
+.site-footer {
+  text-align:center;
+  color:#777;
+  font-size:12px;
+  padding:18px 0 34px;
+}
+
+.logo-brand {
+  position: fixed;
+  right: 15px;
+  bottom: 15px;
+  width: 150px;
+  
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 900px){
+  iframe#calcFrame { max-width: 92%; height: 820px; }
+  .tabs { flex-wrap:wrap; gap:8px; padding:10px; }
+  .site-header { font-size:1.05rem; padding:14px 12px; }
+}
+html, body {
+  overflow-y: hidden; /* elimina el scroll fantasma */
+  height: 100vh; /* ajusta la altura al viewport */
+}
+

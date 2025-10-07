@@ -3,27 +3,6 @@
 Este proyecto reúne un conjunto de **calculadoras web interactivas** diseñadas para el equipo de Tiendamia, con el objetivo de facilitar el cálculo de fechas de entrega y diferencias de peso en los envíos internacionales.  
 Cada herramienta fue desarrollada en **HTML, CSS y JavaScript puro**, priorizando la simplicidad, portabilidad y compatibilidad en distintos navegadores y dispositivos.
 
-## Estructura del Proyecto
-
-Calculadoras_Tiendamia/
-│
-├── index.html
-├── main.css
-├── main.js
-├── TiendamiaLogo.png
-├── logo-™-white.webp
-│
-└── calculadoras/
-├── Fecha de entrega/
-│ ├── index.html
-│ ├── fecha.css
-│ ├── fecha.js
-│ └── feriados.json
-│
-└── Peso/
-├── index.html
-├── peso.css
-└── peso.js
 
 ## Objetivo del Proyecto
 
@@ -102,3 +81,43 @@ Esta herramienta permite comparar el **peso real vs el peso pagado** de un enví
     overflow-y: hidden;
     height: 100vh;
   }
+Los logos (TiendamiaLogo.png y logo-™-white.webp) fueron posicionados de forma absoluta para mantener consistencia en branding.
+
+## Pruebas de Validación
+
+Antes del despliegue, se realizaron pruebas en:
+
+Google Chrome, Firefox y Edge (últimas versiones).
+
+Windows 10/11 y macOS.
+
+Pantallas Full HD y dispositivos móviles.
+
+Se validó:
+
+Correcto funcionamiento del cálculo en ambas herramientas.
+
+Eliminación total del scroll vertical no deseado.
+
+Centrado visual uniforme de todos los componentes.
+
+
+
+## Link de la página principal:
+
+https://bill21ortega.github.io/Calculadoras_Tiendamia/
+
+
+Navegar entre las calculadoras desde el menú principal o abriendo:
+
+calculadoras/Fecha de entrega/index.html
+
+calculadoras/Peso/index.html
+
+👨‍💻 Autor y Mantenimiento
+
+Autor: Willian Ortega
+Año: 10/2025
+Propósito: Uso interno y formativo dentro de Tiendamia.
+
+“Este proyecto busca mejorar la eficiencia operativa del equipo de soporte mediante automatización de cálculos logísticos y estandarización de procesos.”

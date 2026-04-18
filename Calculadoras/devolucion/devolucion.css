@@ -1,0 +1,164 @@
+/* =============================================================
+   devolucion/devolucion.css
+   Estilos unificados con el formato del proyecto Tiendamia
+   ============================================================= */
+
+:root {
+  --brand: #e30613;
+  --bg: #f5f5f5;
+  --card: #ffffff;
+  --text: #222;
+  --muted: #555;
+  --shadow: 0 6px 24px rgba(0,0,0,.06);
+}
+
+/* ===== Reset y base ===== */
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  display: block; 
+  overflow: auto; 
+}
+
+/* ===== Contenedor principal ===== */
+.container {
+  width: 100%;
+  max-width: 460px;
+  background: var(--card);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  padding: 30px;
+  text-align: center;
+  margin: 20px auto;
+  overflow: visible;
+}
+
+/* ===== Títulos ===== */
+h1 {
+  margin: 0 0 15px;
+  font-size: 20px; /* Un poco más pequeño para que quepa bien el texto largo */
+  color: var(--text);
+  text-transform: uppercase;
+}
+
+p.helper {
+  margin: 0 0 18px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+/* ===== Formulario ===== */
+form {
+  display: grid;
+  gap: 16px;
+}
+
+.field, .field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left; /* Alinea los labels a la izquierda como en tus capturas */
+}
+
+.field-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+label {
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+}
+
+select, input[type="text"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 15px;
+  background-color: #fff;
+}
+
+/* Flecha personalizada para los select (opcional para estética) */
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 30px;
+}
+
+/* ===== Botones ===== */
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+button.primary {
+  background: var(--brand);
+  color: #fff;
+  border: 0;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: .15s transform ease;
+  text-transform: uppercase;
+}
+
+button.primary:hover { transform: translateY(-1px); }
+
+button.ghost {
+  background: transparent;
+  color: #333;
+  border: 1px solid #ddd;
+  padding: 12px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+/* ===== Mensajes de Resultado ===== */
+.result, .warn {
+  margin-top: 10px;
+  padding: 14px;
+  border-radius: 10px;
+  display: none; /* Se activa con JS */
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: left;
+}
+
+.result {
+  border: 1px solid #e0f0e6;
+  background: #f4fbf7;
+  color: #185a37;
+}
+
+.warn {
+  border: 1px solid #f2d7d5;
+  background: #fdf2f1;
+  color: #7a2629;
+}
+
+/* Colores dinámicos para el texto del reembolso que pediste */
+.text-positive { color: #28a745; font-weight: bold; }
+.text-negative { color: #e30613; font-weight: bold; }
+
+@media (max-width: 600px) {
+  .field-group { grid-template-columns: 1fr; }
+  .container { width: 95%; padding: 20px; }
+}

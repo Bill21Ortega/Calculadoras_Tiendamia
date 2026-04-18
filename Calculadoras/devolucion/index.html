@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#e30613" />
+  <title>🔄 CALCULADORA DE DEVOLUCIÓN 🔄</title>
+  <link rel="stylesheet" href="devolucion.css" />
+</head>
+<body>
+
+  <main class="container" role="main">
+    <div class="content">
+      <h1>🔄 COSTO DE DEVOLUCIÓN 🔄</h1>
+      <p class="helper">
+        Calcula el <strong>costo de envío</strong> de retorno y el <strong>reembolso neto</strong> estimado según el producto y su origen.
+      </p>
+
+      <form id="calcFormDev" novalidate>
+        <div class="field">
+          <label for="paisOrigen">Origen</label>
+          <select id="paisOrigen" required>
+            <option value="" disabled selected>País</option>
+            <option value="uruguay">Uruguay</option>
+            <option value="argentina">Argentina</option>
+            <option value="ecuador">Ecuador</option>
+            <option value="peru">Perú</option>
+            <option value="costa_rica">Costa Rica</option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <div class="field">
+            <label for="pesoKgs">Peso (kgs)</label>
+            <input id="pesoKgs" type="text" placeholder="Número mayor a 0" required />
+          </div>
+          <div class="field">
+            <label for="valorProducto">Valor Producto (USD)</label>
+            <input id="valorProducto" type="text" placeholder="Número mayor a 0" required />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="categoria">Categoría de Producto</label>
+          <select id="categoria" required>
+            <option value="" disabled selected>Categoría</option>
+            <option value="ropa">Ropa, calzado y accesorios</option>
+            <option value="celulares">Celulares</option>
+            <option value="computadoras">Computadoras</option>
+            <option value="tecnologia">Tecnología</option>
+            <option value="relojes">Relojes y lentes</option>
+            <option value="deporte">Deporte y exteriores</option>
+            <option value="herramientas">Herramientas</option>
+            <option value="bebes">Bebés, niños y juegos</option>
+            <option value="hogar">Hogar y jardín</option>
+          </select>
+        </div>
+
+        <div class="actions">
+          <button type="button" id="calcularDev" class="primary">CALCULAR</button>
+          <button type="button" id="limpiarDev" class="ghost">Limpiar</button>
+        </div>
+
+        <div id="warnDev" class="warn" role="alert"></div>
+        <div id="resultadoDev" class="result"></div>
+
+        <p style="font-size: 11px; color: #777; margin-top: 15px; line-height: 1.4;">
+          <strong>Importante:</strong> El valor indicado es un estimado. El costo final puede variar según el courier, peso/medidas verificados y normativa aduanera aplicable.
+        </p>
+      </form>
+    </div>
+  </main>
+
+  <script src="devolucion.js"></script>
+</body>
+</html>

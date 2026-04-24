@@ -1,11 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const CARGOS = {
-        gestion: 1.79,
-        feeAmz: 0.03,
-        feeLocal: 5,
-        reciprocidad: 0.10,
-        arancelCat: 0.10,
-        exportacionUY: 174
+        gestion: 1.79, feeAmz: 0.03, feeLocal: 5,
+        reciprocidad: 0.10, arancelCat: 0.10, exportacionUY: 174
     };
 
     const obtenerCostoEnvio = (pais, peso) => {
@@ -46,10 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!errorSpan || !errorSpan.classList.contains('error-msg')) {
             errorSpan = document.createElement('span');
             errorSpan.classList.add('error-msg');
-            errorSpan.style.color = 'red';
-            errorSpan.style.fontSize = '11px';
-            errorSpan.style.display = 'block';
-            errorSpan.style.marginTop = '2px';
+            errorSpan.style.cssText = 'color:red; font-size:10px; display:block; margin-top:1px; position:absolute;';
             elemento.parentNode.insertBefore(errorSpan, elemento.nextSibling);
         }
         errorSpan.textContent = mensaje;
@@ -61,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     btnCalcular.addEventListener('click', (e) => {
-        e.preventDefault(); // Evita recarga accidental
+        e.preventDefault();
         limpiarErrores();
         resultadoEl.style.display = 'none';
 
@@ -76,10 +69,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const categoria = categoriaEl.value;
 
         let tieneErrores = false;
-        if (!pais) { mostrarError(paisEl, "Selecciona una opción correcta"); tieneErrores = true; }
-        if (isNaN(valor) || valor <= 0) { mostrarError(valorEl, "Ingresa un valor correcto"); tieneErrores = true; }
-        if (isNaN(peso) || peso <= 0) { mostrarError(pesoEl, "Ingresa un valor correcto"); tieneErrores = true; }
-        if (!categoria) { mostrarError(categoriaEl, "Selecciona una opción correcta"); tieneErrores = true; }
+        if (!pais) { mostrarError(paisEl, "Requerido"); tieneErrores = true; }
+        if (isNaN(valor) || valor <= 0) { mostrarError(valorEl, "Inválido"); tieneErrores = true; }
+        if (isNaN(peso) || peso <= 0) { mostrarError(pesoEl, "Inválido"); tieneErrores = true; }
+        if (!categoria) { mostrarError(categoriaEl, "Requerido"); tieneErrores = true; }
 
         if (tieneErrores) return;
 
@@ -99,52 +92,46 @@ document.addEventListener('DOMContentLoaded', () => {
         const esRecomendable = reembolso >= (valor * 0.30);
         const colorClase = reembolso >= 0 ? 'text-positive' : 'text-negative';
         
-        let avisoShip = (pais === 'ecuador' || pais === 'costa_rica') ? '<br><small style="color: #d9534f;">⚠️ Shipping a cargo del cliente</small>' : '';
+        let avisoShip = (pais === 'ecuador' || pais === 'costa_rica') ? '<small style="color:#d9534f; display:block; font-size:11px;">⚠️ Envío a cargo del cliente</small>' : '';
 
+        // --- RENDERIZADO COMPACTO ---
         resultadoEl.innerHTML = `
-            <div style="text-align: left; border-top: 1px solid #ddd; padding-top: 15px; margin-top: 15px;">
-                <p style="margin: 5px 0;">Costo Devolución: <strong>${costoTotal.toFixed(1)} USD</strong> ${avisoShip}</p>
-                <p style="margin: 5px 0;">Reembolso: <strong class="${colorClase}">${reembolso.toFixed(1)} USD</strong></p>
-                <p style="margin: 5px 0;">Sugerencia: ${esRecomendable ? '<b style="color:green">✅ Recomendable</b>' : '<b style="color:red">❌ No recomendable</b>'}</p>
-                
-                <button id="toggleDesglose" type="button" style="background: none; border: none; color: #007bff; cursor: pointer; padding: 0; font-size: 13px; text-decoration: underline; margin-top: 10px;">
-                    Ver desglose de cargos
-                </button>
-                
-                <div id="desgloseDetalle" style="display: none; background: #f9f9f9; padding: 10px; border-radius: 5px; margin-top: 10px; font-size: 12px; border: 1px dashed #ccc;">
-                    Flete: ${costoEnvio.toFixed(1)} USD<br>
-                    Gestión: ${CARGOS.gestion} USD<br>
-                    Seguro: ${seguro.toFixed(1)} USD<br>
-                    Fee AMZ: ${fAMZ.toFixed(1)} USD<br>
-                    Fee Local: ${CARGOS.feeLocal} USD<br>
-                    ${cargoExportUY > 0 ? `Exportación: ${cargoExportUY} USD<br>` : ''}
-                    Reciprocidad: ${fRec.toFixed(1)} USD<br>
-                    Arancel: ${fAra.toFixed(1)} USD
+            <div style="border-top:1px solid #ddd; margin-top:10px; padding-top:10px; font-size:14px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span>Costo: <b>${costoTotal.toFixed(1)} USD</b></span>
+                    <span>Reembolso: <b class="${colorClase}">${reembolso.toFixed(1)} USD</b></span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>Sugerencia: ${esRecomendable ? '<b style="color:green">✅ Recomendable</b>' : '<b style="color:red">❌ No recomendable</b>'}</span>
+                    <button id="toggleDesglose" type="button" style="background:none; border:none; color:#007bff; cursor:pointer; font-size:12px; text-decoration:underline;">Ver desglose</button>
+                </div>
+                ${avisoShip}
+                <div id="desgloseDetalle" style="display:none; background:#f4f4f4; padding:8px; border-radius:4px; margin-top:8px; font-size:11px; border:1px dashed #ccc; column-count: 2;">
+                    Flete: ${costoEnvio.toFixed(1)}<br>
+                    Gestión: ${CARGOS.gestion}<br>
+                    Seguro: ${seguro.toFixed(1)}<br>
+                    Fee AMZ: ${fAMZ.toFixed(1)}<br>
+                    Fee Local: ${CARGOS.feeLocal}<br>
+                    Reciprocidad: ${fRec.toFixed(1)}<br>
+                    Arancel: ${fAra.toFixed(1)}<br>
+                    ${cargoExportUY > 0 ? `Export: ${cargoExportUY}` : ''}
                 </div>
             </div>
         `;
         resultadoEl.style.display = 'block';
 
-        // Lógica de alternancia (Persistente)
         document.getElementById('toggleDesglose').onclick = function(e) {
-            e.preventDefault(); // Refuerzo para evitar el parpadeo
+            e.preventDefault();
             const d = document.getElementById('desgloseDetalle');
-            if (d.style.display === 'none') {
-                d.style.display = 'block';
-                this.textContent = 'Ocultar desglose';
-            } else {
-                d.style.display = 'none';
-                this.textContent = 'Ver desglose de cargos';
-            }
+            d.style.display = d.style.display === 'none' ? 'block' : 'none';
+            this.textContent = d.style.display === 'none' ? 'Ver desglose' : 'Ocultar';
         };
     });
 
     btnLimpiar.addEventListener('click', () => {
         limpiarErrores();
         resultadoEl.style.display = 'none';
-        pesoEl.value = '';
-        valorEl.value = '';
-        paisEl.selectedIndex = 0;
-        categoriaEl.selectedIndex = 0;
+        pesoEl.value = ''; valorEl.value = '';
+        paisEl.selectedIndex = 0; categoriaEl.selectedIndex = 0;
     });
 });

@@ -36,26 +36,42 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnLimpiar = document.getElementById('limpiarDev');
     const resultadoEl = document.getElementById('resultadoDev');
 
-    const mostrarError = (elemento, mensaje) => {
+    const placeholdersOriginales = {
+        pesoKgs: pesoEl.placeholder || "0.00",
+        valorProducto: valorEl.placeholder || "0.00"
+    };
+
+    const aplicarError = (elemento, mensaje) => {
         elemento.style.borderColor = 'red';
-        let errorSpan = elemento.nextElementSibling;
-        if (!errorSpan || !errorSpan.classList.contains('error-msg')) {
-            errorSpan = document.createElement('span');
-            errorSpan.classList.add('error-msg');
-            errorSpan.style.cssText = 'color:red; font-size:10px; display:block; margin-top:1px; position:absolute;';
-            elemento.parentNode.insertBefore(errorSpan, elemento.nextSibling);
+        if (elemento.tagName === 'SELECT') {
+            elemento.options[0].text = "⚠️ " + mensaje;
+        } else {
+            elemento.value = '';
+            elemento.placeholder = "⚠️ " + mensaje;
         }
-        errorSpan.textContent = mensaje;
     };
 
     const limpiarErrores = () => {
-        document.querySelectorAll('.error-msg').forEach(el => el.remove());
-        [paisEl, pesoEl, valorEl, categoriaEl].forEach(el => el.style.borderColor = '');
+        [paisEl, pesoEl, valorEl, categoriaEl].forEach(el => {
+            el.style.borderColor = '';
+            if (el.tagName === 'SELECT') {
+                if(el.id === 'paisOrigen') el.options[0].text = "País";
+                if(el.id === 'categoria') el.options[0].text = "Categoría";
+            } else {
+                el.placeholder = placeholdersOriginales[el.id];
+            }
+        });
     };
+
+    [paisEl, pesoEl, valorEl, categoriaEl].forEach(el => {
+        el.addEventListener('focus', () => {
+            el.style.borderColor = '';
+            if (el.tagName !== 'SELECT') el.placeholder = placeholdersOriginales[el.id];
+        });
+    });
 
     btnCalcular.addEventListener('click', (e) => {
         e.preventDefault();
-        limpiarErrores();
         resultadoEl.style.display = 'none';
 
         const normalizarInput = (inputEl) => {
@@ -69,19 +85,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const categoria = categoriaEl.value;
 
         let tieneErrores = false;
-        if (!pais) { mostrarError(paisEl, "Requerido"); tieneErrores = true; }
-        if (isNaN(valor) || valor <= 0) { mostrarError(valorEl, "Inválido"); tieneErrores = true; }
-        if (isNaN(peso) || peso <= 0) { mostrarError(pesoEl, "Inválido"); tieneErrores = true; }
-        if (!categoria) { mostrarError(categoriaEl, "Requerido"); tieneErrores = true; }
+        if (!pais) { aplicarError(paisEl, "Requerido"); tieneErrores = true; }
+        if (isNaN(valor) || valor <= 0) { aplicarError(valorEl, "Inválido"); tieneErrores = true; }
+        if (isNaN(peso) || peso <= 0) { aplicarError(pesoEl, "Inválido"); tieneErrores = true; }
+        if (!categoria) { aplicarError(categoriaEl, "Requerido"); tieneErrores = true; }
 
         if (tieneErrores) return;
 
         let costoEnvio = obtenerCostoEnvio(pais, peso);
-        let seguro = 0;
-        if (pais === 'argentina') seguro = 13.5;
-        if (pais === 'uruguay') seguro = valor >= 400 ? valor * 0.01 : 4;
-
+        let seguro = (pais === 'argentina') ? 13.5 : (pais === 'uruguay' ? (valor >= 400 ? valor * 0.01 : 4) : 0);
         let cargoExportUY = (pais === 'uruguay' && valor >= 200) ? CARGOS.exportacionUY : 0;
+        
         const fAMZ = valor * CARGOS.feeAmz;
         const fRec = valor * CARGOS.reciprocidad;
         const fAra = valor * CARGOS.arancelCat;
@@ -92,28 +106,28 @@ document.addEventListener('DOMContentLoaded', () => {
         const esRecomendable = reembolso >= (valor * 0.30);
         const colorClase = reembolso >= 0 ? 'text-positive' : 'text-negative';
         
-        let avisoShip = (pais === 'ecuador' || pais === 'costa_rica') ? '<small style="color:#d9534f; display:block; font-size:11px;">⚠️ Envío a cargo del cliente</small>' : '';
+        let avisoShip = (pais === 'ecuador' || pais === 'costa_rica') ? 
+            '<small style="color:#d9534f; display:block; font-size:11px; margin-top:2px;">⚠️ Envío cargo cliente</small>' : '';
 
-        // --- RENDERIZADO COMPACTO ---
         resultadoEl.innerHTML = `
-            <div style="border-top:1px solid #ddd; margin-top:10px; padding-top:10px; font-size:14px;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+            <div style="border-top:1px solid #ddd; margin-top:8px; padding-top:8px; font-size:13px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 2px;">
                     <span>Costo: <b>${costoTotal.toFixed(1)} USD</b></span>
                     <span>Reembolso: <b class="${colorClase}">${reembolso.toFixed(1)} USD</b></span>
                 </div>
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span>Sugerencia: ${esRecomendable ? '<b style="color:green">✅ Recomendable</b>' : '<b style="color:red">❌ No recomendable</b>'}</span>
-                    <button id="toggleDesglose" type="button" style="background:none; border:none; color:#007bff; cursor:pointer; font-size:12px; text-decoration:underline;">Ver desglose</button>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+                    <span>Sugerencia: ${esRecomendable ? '<b style="color:green">✅ Recomendable</b>' : '<b style="color:red">❌ No</b>'}</span>
+                    <button id="toggleDesglose" type="button" style="background:none; border:none; color:#007bff; cursor:pointer; font-size:11px; text-decoration:underline; padding:0;">Detalles</button>
                 </div>
                 ${avisoShip}
-                <div id="desgloseDetalle" style="display:none; background:#f4f4f4; padding:8px; border-radius:4px; margin-top:8px; font-size:11px; border:1px dashed #ccc; column-count: 2;">
+                <div id="desgloseDetalle" style="display:none; background:#f4f4f4; padding:6px; border-radius:4px; margin-top:5px; font-size:10px; border:1px dashed #ccc; column-count: 2; line-height:1.2;">
                     Flete: ${costoEnvio.toFixed(1)}<br>
                     Gestión: ${CARGOS.gestion}<br>
                     Seguro: ${seguro.toFixed(1)}<br>
                     Fee AMZ: ${fAMZ.toFixed(1)}<br>
                     Fee Local: ${CARGOS.feeLocal}<br>
-                    Reciprocidad: ${fRec.toFixed(1)}<br>
-                    Arancel: ${fAra.toFixed(1)}<br>
+                    Recip: ${fRec.toFixed(1)}<br>
+                    Aranc: ${fAra.toFixed(1)}<br>
                     ${cargoExportUY > 0 ? `Export: ${cargoExportUY}` : ''}
                 </div>
             </div>
@@ -124,7 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const d = document.getElementById('desgloseDetalle');
             d.style.display = d.style.display === 'none' ? 'block' : 'none';
-            this.textContent = d.style.display === 'none' ? 'Ver desglose' : 'Ocultar';
+            this.textContent = d.style.display === 'none' ? 'Detalles' : 'Ocultar';
         };
     });
 

@@ -1,33 +1,44 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // 1. CARGOS CONSTANTES GLOBALES
     const CARGOS = {
-        gestion: 1.79, feeAmz: 0.03, feeLocal: 5,
-        reciprocidad: 0.10, arancelCat: 0.10, exportacionUY: 174
+        gestion: 1.79, 
+        feeAmz: 0.03, 
+        feeLocal: 5,
+        reciprocidad: 0.10, 
+        arancelCat: 0.10, 
+        exportacionUY: 174
     };
 
+    // 2. FUNCIÓN DE FLETE (Tarifas planas basadas en el Excel)
     const obtenerCostoEnvio = (pais, peso) => {
+        let pesoRedondeado = Math.ceil(peso); // Redondeo hacia arriba (ej. 1.2kg -> 2kg)
+        
         if (pais === 'ecuador' || pais === 'costa_rica') return 0;
+        
         if (pais === 'argentina') {
-            if (peso <= 0.5) return 31.23;
-            if (peso <= 2.0) return 38.92;
-            if (peso <= 5.0) return 66.38;
-            return 131.92;
+            if (pesoRedondeado <= 1) return 35.13;
+            if (pesoRedondeado === 2) return 46.63;
+            if (pesoRedondeado === 3) return 55.69;
+            return 55.69 + ((pesoRedondeado - 3) * 10); // Estimación para mayores a 3kg
         }
+        
+        if (pais === 'uruguay') {
+            if (pesoRedondeado <= 1) return 36.15;
+            if (pesoRedondeado === 2) return 48.17;
+            if (pesoRedondeado === 3) return 56.75;
+            return 56.75 + ((pesoRedondeado - 3) * 10); // Estimación para mayores a 3kg
+        }
+
         if (pais === 'peru') {
             if (peso <= 0.5) return 25.44;
             if (peso <= 2.0) return 29.23;
-            if (peso <= 10.0) return 124.16;
             return 124.16;
         }
-        if (pais === 'uruguay') {
-            if (peso <= 0.8) return 32.58;
-            if (peso <= 1.0) return 32.73;
-            if (peso <= 1.5) return 36.15;
-            if (peso <= 9.5) return 131.09;
-            return 138.82;
-        }
+
         return 0;
     };
 
+    // 3. REFERENCIAS AL DOM
     const paisEl = document.getElementById('paisOrigen');
     const pesoEl = document.getElementById('pesoKgs');
     const valorEl = document.getElementById('valorProducto');
@@ -70,9 +81,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // 4. LÓGICA PRINCIPAL (La magia idéntica al Excel)
     btnCalcular.addEventListener('click', (e) => {
         e.preventDefault();
         resultadoEl.style.display = 'none';
+        limpiarErrores();
 
         const normalizarInput = (inputEl) => {
             let valorTexto = inputEl.value.trim().replace(',', '.');
@@ -89,39 +102,54 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isNaN(valor) || valor <= 0) { aplicarError(valorEl, "Inválido"); tieneErrores = true; }
         if (isNaN(peso) || peso <= 0) { aplicarError(pesoEl, "Inválido"); tieneErrores = true; }
         if (!categoria) { aplicarError(categoriaEl, "Requerido"); tieneErrores = true; }
-
         if (tieneErrores) return;
 
-        let costoEnvio = obtenerCostoEnvio(pais, peso);
+        // Regla de $65 USD
+        if (valor < 65) {
+            resultadoEl.innerHTML = `<div style="border:1px solid red; background:#fff5f5; padding:8px; border-radius:4px; margin-top:8px; color:red; font-size:12px; text-align:center;">⚠️ <b>No permitida:</b> Valor menor a $65 USD.</div>`;
+            resultadoEl.style.display = 'block';
+            return;
+        }
+
+        // --- EXTRACCIÓN DE COSTOS ---
+        let flete = obtenerCostoEnvio(pais, peso);
         let seguro = (pais === 'argentina') ? 13.5 : (pais === 'uruguay' ? (valor >= 400 ? valor * 0.01 : 4) : 0);
         let cargoExportUY = (pais === 'uruguay' && valor >= 200) ? CARGOS.exportacionUY : 0;
         
-        const fAMZ = valor * CARGOS.feeAmz;
-        const fRec = valor * CARGOS.reciprocidad;
-        const fAra = valor * CARGOS.arancelCat;
+        let fAMZ = valor * CARGOS.feeAmz;
+        let fRec = valor * CARGOS.reciprocidad;
+        let fAra = valor * CARGOS.arancelCat;
+        let cargosFijos = CARGOS.gestion + seguro + CARGOS.feeLocal + cargoExportUY;
 
-        const costoTotal = costoEnvio + CARGOS.gestion + seguro + fAMZ + CARGOS.feeLocal + cargoExportUY + fRec + fAra;
-        const reembolso = valor - costoTotal;
+        // 1. SUBTOTAL REAL (Para sacar el reembolso, igual que el Excel)
+        let subtotalBreakdown = flete + cargosFijos + fAMZ + fRec + fAra;
 
-        const esRecomendable = reembolso >= (valor * 0.30);
-        const colorClase = reembolso >= 0 ? 'text-positive' : 'text-negative';
-        
+        // 2. COSTO FINAL MOSTRADO (Con recargo del 25% para Arg y UY)
+        let multiplicadorFinal = (pais === 'argentina' || pais === 'uruguay') ? 1.25 : 1.0;
+        let costoTotalMostrado = subtotalBreakdown * multiplicadorFinal;
+
+        // 3. REEMBOLSO (Se descuenta usando el subtotal SIN recargo)
+        let reembolsoFinal = valor - subtotalBreakdown;
+
+        const esRecomendable = reembolsoFinal >= (valor * 0.30);
+        const colorClase = reembolsoFinal >= 0 ? 'text-positive' : 'text-negative';
         let avisoShip = (pais === 'ecuador' || pais === 'costa_rica') ? 
             '<small style="color:#d9534f; display:block; font-size:11px; margin-top:2px;">⚠️ Envío cargo cliente</small>' : '';
 
+        // RENDERIZADO
         resultadoEl.innerHTML = `
-            <div style="border-top:1px solid #ddd; margin-top:8px; padding-top:8px; font-size:13px;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 2px;">
-                    <span>Costo: <b>${costoTotal.toFixed(1)} USD</b></span>
-                    <span>Reembolso: <b class="${colorClase}">${reembolso.toFixed(1)} USD</b></span>
+            <div style="border-top:1px solid #ddd; margin-top:10px; padding-top:10px; font-size:14px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span>Costo: <b>${costoTotalMostrado.toFixed(1)} USD</b></span>
+                    <span>Reembolso: <b class="${colorClase}">${reembolsoFinal.toFixed(1)} USD</b></span>
                 </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
                     <span>Sugerencia: ${esRecomendable ? '<b style="color:green">✅ Recomendable</b>' : '<b style="color:red">❌ No</b>'}</span>
-                    <button id="toggleDesglose" type="button" style="background:none; border:none; color:#007bff; cursor:pointer; font-size:11px; text-decoration:underline; padding:0;">Detalles</button>
+                    <button id="toggleDesglose" type="button" style="background:none; border:none; color:#007bff; cursor:pointer; font-size:12px; text-decoration:underline;">Detalles</button>
                 </div>
                 ${avisoShip}
-                <div id="desgloseDetalle" style="display:none; background:#f4f4f4; padding:6px; border-radius:4px; margin-top:5px; font-size:10px; border:1px dashed #ccc; column-count: 2; line-height:1.2;">
-                    Flete: ${costoEnvio.toFixed(1)}<br>
+                <div id="desgloseDetalle" style="display:none; background:#f4f4f4; padding:8px; border-radius:4px; margin-top:8px; font-size:11px; border:1px dashed #ccc; column-count: 2; line-height:1.4;">
+                    Flete: ${flete.toFixed(1)}<br>
                     Gestión: ${CARGOS.gestion}<br>
                     Seguro: ${seguro.toFixed(1)}<br>
                     Fee AMZ: ${fAMZ.toFixed(1)}<br>

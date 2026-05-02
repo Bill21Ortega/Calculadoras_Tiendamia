@@ -9,17 +9,18 @@ document.addEventListener('DOMContentLoaded', () => {
         exportacionUY: 174
     };
 
-    // 2. FUNCIÓN DE FLETE (Búsqueda Volumétrica en Tabla Maestra)
+    // 2. FUNCIÓN DE FLETE (Búsqueda Volumétrica en Tabla Maestra Oficial)
     const obtenerCostoEnvio = (pais, pesoReal) => {
         if (pais === 'ecuador' || pais === 'costa_rica') return 0;
 
-        // REGLA SECRETA DEL COURIER: Cálculo del Peso Volumétrico
+        // Regla del courier: Cálculo del Peso Volumétrico
         let pesoBase = Math.ceil(pesoReal);
         let pesoVolumetrico = (pesoBase <= 1) ? 1.5 : pesoBase + 1;
         
-        // Se suma 0.01 para forzar que el Excel busque en el siguiente escalón (ej. 5 va al rango 5.5)
+        // Sumamos 0.01 para forzar la búsqueda en el siguiente escalón aduanero
         let pesoBuscar = pesoVolumetrico + 0.01; 
 
+        // Tabla Maestra de Tarifas Oficiales (Hasta 70kg)
         const tablaMaestra = {
             'uruguay': [
                 [0.5, 29.21], [1, 32.58], [1.5, 32.73], [2, 36.15], [2.5, 39.58], [3, 43.87], [3.5, 48.17], [4, 52.46], [4.5, 56.75], [5, 59.64],
@@ -47,7 +48,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const paisData = tablaMaestra[pais];
         if (!paisData) return 0;
 
-        // Busca la tarifa exacta según el peso volumétrico
         for (const [maxPeso, costo] of paisData) {
             if (pesoBuscar <= maxPeso) return costo;
         }
@@ -123,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (tieneErrores) return;
 
         if (valor < 65) {
-            resultadoEl.innerHTML = `<div style="border:1px solid red; background:#fff5f5; padding:8px; border-radius:4px; margin-top:8px; color:red; font-size:12px; text-align:center;">⚠️ <b>No permitida:</b> Valor menor a $65 USD.</div>`;
+            resultadoEl.innerHTML = `<div style="border:1px solid red; background:#fff5f5; padding:6px; border-radius:4px; margin-top:6px; color:red; font-size:12px; text-align:center;">⚠️ <b>No permitida:</b> Valor menor a 65 USD.</div>`;
             resultadoEl.style.display = 'block';
             return;
         }
@@ -136,17 +136,12 @@ document.addEventListener('DOMContentLoaded', () => {
         let fAMZ = valor * CARGOS.feeAmz;
         let fRec = valor * CARGOS.reciprocidad;
         let fAra = valor * CARGOS.arancelCat;
-        
         let cargosFijos = CARGOS.gestion + seguro + CARGOS.feeLocal + cargoExportUY;
 
-        // 1. SUBTOTAL REAL
         let subtotalBreakdown = flete + cargosFijos + fAMZ + fRec + fAra;
 
-        // 2. COSTO FINAL MOSTRADO (+25%)
         let multiplicadorFinal = (pais === 'argentina' || pais === 'uruguay') ? 1.25 : 1.0;
         let costoTotalMostrado = subtotalBreakdown * multiplicadorFinal;
-
-        // 3. REEMBOLSO (calculado desde el subtotal)
         let reembolsoFinal = valor - subtotalBreakdown;
 
         const esRecomendable = reembolsoFinal >= (valor * 0.30);
@@ -154,23 +149,24 @@ document.addEventListener('DOMContentLoaded', () => {
         let avisoShip = (pais === 'ecuador' || pais === 'costa_rica') ? 
             '<small style="color:#d9534f; display:block; font-size:11px; margin-top:2px;">⚠️ Envío cargo cliente</small>' : '';
 
+        // UI COMPACTA PARA ELIMINAR EL SCROLL
         resultadoEl.innerHTML = `
-            <div style="border-top:1px solid #ddd; margin-top:10px; padding-top:10px; font-size:14px;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+            <div style="border-top:1px solid #ddd; margin-top:6px; padding-top:6px; font-size:13px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 2px;">
                     <span>Costo: <b>${costoTotalMostrado.toFixed(1)} USD</b></span>
                     <span>Reembolso: <b class="${colorClase}">${reembolsoFinal.toFixed(1)} USD</b></span>
                 </div>
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <span>Sugerencia: ${esRecomendable ? '<b style="color:green">✅ Recomendable</b>' : '<b style="color:red">❌ No</b>'}</span>
-                    <button id="toggleDesglose" type="button" style="background:none; border:none; color:#007bff; cursor:pointer; font-size:12px; text-decoration:underline;">Detalles</button>
+                    <button id="toggleDesglose" type="button" style="background:none; border:none; color:#007bff; cursor:pointer; font-size:11px; text-decoration:underline; padding:0;">Ver Detalles</button>
                 </div>
                 ${avisoShip}
-                <div id="desgloseDetalle" style="display:none; background:#f4f4f4; padding:8px; border-radius:4px; margin-top:8px; font-size:11px; border:1px dashed #ccc; column-count: 2; line-height:1.4;">
+                <div id="desgloseDetalle" style="display:none; background:#f4f4f4; padding:6px; border-radius:4px; margin-top:4px; font-size:10px; border:1px dashed #ccc; column-count: 2; line-height:1.3;">
                     Flete: ${flete.toFixed(2)}<br>
                     Gestión: ${CARGOS.gestion}<br>
                     Seguro: ${seguro.toFixed(2)}<br>
-                    Fee AMZ: ${fAMZ.toFixed(2)}<br>
-                    Fee Local: ${CARGOS.feeLocal}<br>
+                    AMZ: ${fAMZ.toFixed(2)}<br>
+                    Local: ${CARGOS.feeLocal}<br>
                     Recip: ${fRec.toFixed(2)}<br>
                     Aranc: ${fAra.toFixed(2)}<br>
                     ${cargoExportUY > 0 ? `Export: ${cargoExportUY}` : ''}
@@ -183,7 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const d = document.getElementById('desgloseDetalle');
             d.style.display = d.style.display === 'none' ? 'block' : 'none';
-            this.textContent = d.style.display === 'none' ? 'Detalles' : 'Ocultar';
+            this.textContent = d.style.display === 'none' ? 'Ocultar' : 'Ver Detalles';
         };
     });
 

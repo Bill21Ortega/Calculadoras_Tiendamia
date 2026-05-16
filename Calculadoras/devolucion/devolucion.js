@@ -5,15 +5,14 @@ document.addEventListener('DOMContentLoaded', () => {
         feeAmz: 0.03, 
         feeLocal: 5,
         reciprocidad: 0.10, 
-        arancelCat: 0.10, 
-        exportacionUY: 174
+        arancelCat: 0.10 // 10% fijo para todas las categorías
     };
 
-    // 2. FUNCIÓN DE FLETE (Sin recargos fantasma, clon exacto del Excel nuevo)
+    // 2. FUNCIÓN DE FLETE (Tabla completa hasta 70kg)
     const obtenerCostoEnvio = (pais, pesoReal) => {
         if (pais === 'ecuador' || pais === 'costa_rica') return 0;
 
-        // El Excel salta al siguiente escalón si el peso es exacto (ej. 1kg busca la tarifa de 1.5kg)
+        // Simulamos el salto al siguiente escalón aduanero
         let pesoBuscar = pesoReal + 0.001; 
 
         const tablaMaestra = {
@@ -21,18 +20,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 [0.5, 29.21], [1, 32.58], [1.5, 32.73], [2, 36.15], [2.5, 39.58], [3, 43.87], [3.5, 48.17], [4, 52.46], [4.5, 56.75], [5, 59.64],
                 [5.5, 68.82], [6, 78.44], [6.5, 84.92], [7, 92.70], [7.5, 100.48], [8, 107.11], [8.5, 115.49], [9, 122.46], [9.5, 131.09], [10, 138.82],
                 [11, 153.83], [12, 169.93], [13, 185.39], [14, 200.85], [15, 217.15], [16, 232.41], [17, 247.71], [18, 263.27], [19, 278.83], [20, 294.38],
+                [21, 302.41], [22, 310.84], [23, 319.27], [24, 327.40], [25, 335.52], [26, 344.25], [27, 352.68], [28, 360.81], [29, 369.04], [30, 377.26],
                 [40, 501.95], [50, 632.45], [60, 762.94], [70, 893.43]
             ],
             'argentina': [
                 [0.5, 30.90], [1, 31.23], [1.5, 31.33], [2, 35.13], [2.5, 38.92], [3, 42.77], [3.5, 46.63], [4, 50.48], [4.5, 55.69], [5, 59.44],
                 [5.5, 66.38], [6, 73.76], [6.5, 80.60], [7, 87.43], [7.5, 96.28], [8, 101.97], [8.5, 109.40], [9, 115.43], [9.5, 123.12], [10, 131.92],
                 [11, 140.02], [12, 146.89], [13, 154.27], [14, 161.66], [15, 171.91], [16, 179.09], [17, 186.33], [18, 193.81], [19, 201.29], [20, 210.80],
+                [21, 217.88], [22, 225.37], [23, 232.85], [24, 240.03], [25, 249.24], [26, 257.02], [27, 264.50], [28, 271.69], [29, 278.97], [30, 288.28],
                 [40, 297.19], [50, 311.89], [60, 326.60], [70, 341.01]
             ],
             'peru': [
                 [0.5, 25.34], [1, 25.44], [1.5, 25.54], [2, 25.64], [2.5, 29.23], [3, 32.84], [3.5, 36.45], [4, 40.06], [4.5, 43.67], [5, 47.28],
                 [5.5, 53.69], [6, 60.09], [6.5, 66.50], [7, 72.91], [7.5, 79.31], [8, 85.72], [8.5, 92.13], [9, 98.54], [9.5, 104.94], [10, 111.35],
                 [11, 124.16], [12, 136.98], [13, 149.79], [14, 162.61], [15, 175.42], [16, 188.23], [17, 201.05], [18, 213.86], [19, 226.68], [20, 239.49],
+                [21, 246.00], [22, 252.50], [23, 259.01], [24, 265.52], [25, 272.02], [26, 278.53], [27, 285.04], [28, 291.55], [29, 298.05], [30, 304.56],
                 [40, 425.02], [50, 551.28], [60, 677.54], [70, 803.80]
             ]
         };
@@ -61,6 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
         valorProducto: valorEl.placeholder || "0.00"
     };
 
+    // 4. FUNCIONES DE INTERFAZ Y MANEJO DE ERRORES
     const aplicarError = (elemento, mensaje) => {
         elemento.style.borderColor = 'red';
         if (elemento.tagName === 'SELECT') {
@@ -90,7 +93,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 4. LÓGICA DE CÁLCULO
+    const mostrarAlertaRoja = (mensaje) => {
+        resultadoEl.innerHTML = `<div style="border:1px solid red; background:#fff5f5; padding:6px; border-radius:4px; margin-top:6px; color:red; font-size:12px; text-align:center;">⚠️ <b>No permitida:</b> ${mensaje}</div>`;
+        resultadoEl.style.display = 'block';
+    };
+
+    // 5. LÓGICA PRINCIPAL DE CÁLCULO
     btnCalcular.addEventListener('click', (e) => {
         e.preventDefault();
         resultadoEl.style.display = 'none';
@@ -113,23 +121,23 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!categoria) { aplicarError(categoriaEl, "Requerido"); tieneErrores = true; }
         if (tieneErrores) return;
 
-        if (valor < 65) {
-            resultadoEl.innerHTML = `<div style="border:1px solid red; background:#fff5f5; padding:6px; border-radius:4px; margin-top:6px; color:red; font-size:12px; text-align:center;">⚠️ <b>No permitida:</b> Valor menor a 65 USD.</div>`;
-            resultadoEl.style.display = 'block';
-            return;
-        }
+        // --- REGLAS DE BLOQUEO (CANDADOS FINALES) ---
+        if (valor < 65) return mostrarAlertaRoja("Valor menor a 65 USD.");
+        if (peso > 70) return mostrarAlertaRoja("El peso excede el límite máximo de 70 kgs.");
+        // Nota: Se eliminó el límite superior de Valor, ahora acepta $3000+
 
-        // --- CÁLCULO DE COSTOS EXACTOS (Sin multiplicadores extraños) ---
+        // --- EXTRACCIÓN DE COSTOS ---
         let flete = obtenerCostoEnvio(pais, peso);
+        
+        // Seguro: ARG=13.5, UY=4 (o 1% si >400), Perú/Otros = 0
         let seguro = (pais === 'argentina') ? 13.5 : (pais === 'uruguay' ? (valor >= 400 ? valor * 0.01 : 4) : 0);
-        let cargoExportUY = (pais === 'uruguay' && valor >= 200) ? CARGOS.exportacionUY : 0;
         
         let fAMZ = valor * CARGOS.feeAmz;
         let fRec = valor * CARGOS.reciprocidad;
         let fAra = valor * CARGOS.arancelCat;
-        let cargosFijos = CARGOS.gestion + seguro + CARGOS.feeLocal + cargoExportUY;
+        let cargosFijos = CARGOS.gestion + seguro + CARGOS.feeLocal;
 
-        // SUMA DIRECTA (Igual al Excel de tu supervisora)
+        // SUMA DIRECTA Y REEMBOLSO
         let costoTotalMostrado = flete + cargosFijos + fAMZ + fRec + fAra;
         let reembolsoFinal = valor - costoTotalMostrado;
 
@@ -138,7 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let avisoShip = (pais === 'ecuador' || pais === 'costa_rica') ? 
             '<small style="color:#d9534f; display:block; font-size:11px; margin-top:2px;">⚠️ Envío cargo cliente</small>' : '';
 
-        // RENDERIZADO
+        // UI COMPACTA
         resultadoEl.innerHTML = `
             <div style="border-top:1px solid #ddd; margin-top:6px; padding-top:6px; font-size:13px;">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 2px;">
@@ -158,7 +166,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     Local: ${CARGOS.feeLocal}<br>
                     Recip: ${fRec.toFixed(2)}<br>
                     Aranc: ${fAra.toFixed(2)}<br>
-                    ${cargoExportUY > 0 ? `Export: ${cargoExportUY}` : ''}
                 </div>
             </div>
         `;

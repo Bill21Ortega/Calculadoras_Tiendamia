@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Cambios Perú</title>
+    <link rel="stylesheet" href="cambiope.css">
+</head>
+<body>
+
+    <!-- Contenedor tipo Tarjeta (Card) -->
+    <div id="calcCambiosPeru" class="calc-card">
+        <h3>🧮 CAMBIO DE PRODUCTO PERÚ 🧮</h3>
+        <p class="descripcion-calc">Cotiza la diferencia a cobrar por el cambio de producto con la tasa de cambio del día en USD.</p>
+
+        <!-- Fila 1: Valores -->
+        <div class="input-row">
+            <div class="input-group">
+                <label>VALOR PAGADO (PEN)</label>
+                <input type="number" id="cp_valorPagado" placeholder="Ej. 150.00" min="0">
+            </div>
+            <div class="input-group">
+                <label>NUEVO VALOR (PEN)</label>
+                <input type="number" id="cp_valorNuevo" placeholder="Ej. 200.00" min="0">
+            </div>
+        </div>
+
+        <!-- Fila 2: Pesos -->
+        <div class="input-row">
+            <div class="input-group">
+                <label>PESO PAGADO (kg) - *Por definir*</label>
+                <input type="number" id="cp_pesoPagado" placeholder="Ej. 1.2" min="0">
+            </div>
+            <div class="input-group">
+                <label>NUEVO PESO (kg) - *Por definir*</label>
+                <input type="number" id="cp_pesoNuevo" placeholder="Ej. 2.1" min="0">
+            </div>
+        </div>
+
+        <!-- Botones centrados -->
+        <div class="acciones-form">
+            <button id="cp_btnCalcular" class="btn-rojo">CALCULAR</button>
+            <button id="cp_btnLimpiar" class="btn-blanco">LIMPIAR</button>
+        </div>
+
+        <!-- PLAN DE EMERGENCIA -->
+        <div id="cp_emergenciaAPI" class="alerta-emergencia" style="display: none;">
+            <p>⚠️ <b>¡El servidor de divisas no responde!</b></p>
+            <p>Ingresa el tipo de cambio del día manualmente.</p>
+            <a href="https://www.google.com/search?q=1+usd+a+pen" target="_blank" class="link-google">🔍 Consultar tasa actual en Google</a>
+            <div style="margin-top: 15px; display: flex; justify-content: center; gap: 10px; align-items: center;">
+                <label>1 USD = </label>
+                <input type="number" id="cp_tasaManual" placeholder="Ej. 3.75" style="width: 100px; padding: 5px; text-align: center;">
+                <span>PEN</span>
+            </div>
+        </div>
+
+        <!-- Resultados -->
+        <div id="cp_resultado" class="resultado-container" style="display: none;">
+            <p id="cp_infoTasa" class="texto-tasa">Cargando...</p>
+            
+            <div class="resumen-final">
+                <div class="linea-resultado">
+                    <span>Diferencia (Soles):</span>
+                    <strong id="cp_diffPen">0.00 PEN</strong>
+                </div>
+                <div class="linea-resultado highlight-usd">
+                    <span>Diferencia (Dólares):</span>
+                    <strong id="cp_diffUsd">0.00 USD</strong>
+                </div>
+            </div>
+
+            <div id="cp_veredicto" class="caja-veredicto">
+                <!-- Mensaje -->
+            </div>
+        </div>
+    </div>
+
+    <script src="cambiope.js"></script>
+</body>
+</html>

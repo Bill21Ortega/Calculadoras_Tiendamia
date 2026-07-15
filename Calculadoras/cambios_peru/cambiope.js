@@ -175,7 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             // Consulta de Tasa de Cambio (Lado del cliente)
-            const response = await fetch('https://open.er-api-ERROR.com/v6/latest/USD');
+            const response = await fetch('https://open.er-api.com/v6/latest/USD');
             const data = await response.json();
             
             if (data.result === "success") {

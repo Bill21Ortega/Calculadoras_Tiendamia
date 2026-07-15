@@ -1,81 +1,89 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Cambios Perú</title>
-    <link rel="stylesheet" href="cambiope.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#e30613" />
+  <title>🧮 CAMBIO DE PRODUCTO PERÚ 🧮</title>
+  
+  <!-- Conexión al nuevo archivo de diseño -->
+  <link rel="stylesheet" href="cambiope.css" />
 </head>
 <body>
+  
+  <!-- Contenido principal -->
+  <main class="container" role="main">
+    <div class="content">
+      <h1>🧮 CAMBIO DE PRODUCTO PERÚ 🧮</h1>
+      <p class="helper">
+        Ingresa los valores y pesos en Soles (PEN) y Kilos (kg). Si pasaron más de 12h, marca la casilla para sumar el costo de gestión automático.
+      </p>
 
-    <!-- Contenedor tipo Tarjeta (Card) -->
-    <div id="calcCambiosPeru" class="calc-card">
-        <h3>🧮 CAMBIO DE PRODUCTO PERÚ 🧮</h3>
-        <p class="descripcion-calc">Cotiza la diferencia a cobrar por el cambio de producto con la tasa de cambio del día en USD.</p>
+      <!-- Formulario principal -->
+      <form id="calcCambioForm" novalidate>
+        
+        <!-- Fila 1: Valores en Soles -->
+        <div class="field-group">
+          <div class="field">
+            <label for="valorPagado">VALOR PAGADO (PEN)</label>
+            <input id="valorPagado" type="text" placeholder="Ej. 150.00" required />
+          </div>
+          <div class="field">
+            <label for="nuevoValor">NUEVO VALOR (PEN)</label>
+            <input id="nuevoValor" type="text" placeholder="Ej. 200.00" required />
+          </div>
+        </div>
 
-        <!-- Fila 1: Valores -->
-        <div class="input-row">
-            <div class="input-group">
-                <label>VALOR PAGADO (PEN)</label>
-                <input type="number" id="cp_valorPagado" placeholder="Ej. 150.00" min="0">
-            </div>
-            <div class="input-group">
-                <label>NUEVO VALOR (PEN)</label>
-                <input type="number" id="cp_valorNuevo" placeholder="Ej. 200.00" min="0">
+        <!-- Fila 2: Pesos en Kilos -->
+        <div class="field-group">
+          <div class="field">
+            <label for="pesoPagado">PESO PAGADO (kg)</label>
+            <input id="pesoPagado" type="text" placeholder="Ej. 1.2" required />
+          </div>
+          <div class="field">
+            <label for="nuevoPeso">NUEVO PESO (kg)</label>
+            <input id="nuevoPeso" type="text" placeholder="Ej. 2.1" required />
+          </div>
+        </div>
+
+        <!-- Casilla 12 horas (Centrada) -->
+        <div class="field" style="flex-direction: row; align-items: center; justify-content: center; margin-top: 10px; background-color: #f9f9f9; padding: 10px; border-radius: 8px; border: 1px solid #eee;">
+            <input type="checkbox" id="penalidad12h" style="width: 20px; height: 20px; margin-right: 10px; cursor: pointer;">
+            <label for="penalidad12h" style="cursor: pointer; margin-bottom: 0; color: #333; font-weight: bold;">
+              ✅ Pasaron más de 12 Horas (+ $15 USD)
+            </label>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="actions">
+          <button type="button" id="calcular" class="primary">CALCULAR</button>
+          <button type="button" id="limpiar" class="ghost">LIMPIAR</button>
+        </div>
+
+        <!-- PLAN DE EMERGENCIA (API Caída) -->
+        <div id="emergenciaAPI" class="warn" style="display: none; text-align: center; margin-top: 15px;">
+            <p style="margin-top: 0;">⚠️ <b>¡El servidor de divisas no responde!</b></p>
+            <p>Ingresa el tipo de cambio del día manualmente para continuar.</p>
+            <a href="https://www.google.com/search?q=cambio+de+dolares+a+soles+peruanos&sca_esv=7f18ccfbdad134d1&rlz=1C1GCEA_enCO1160CO1161&sxsrf=APpeQnt_8C4Inr02atP8gL-FUq43VBdxmg%3A1784135866697&ei=usBXaqaRKtiDwbkP_YmJ4QQ&biw=1707&bih=811&oq=cambio+de+dolares+a+soles+&gs_lp=Egxnd3Mtd2l6LXNlcnAiGmNhbWJpbyBkZSBkb2xhcmVzIGEgc29sZXMgKgIIADIFEAAYgAQyBRAAGIAEMgUQABiABDIFEAAYgAQyBRAAGIAEMgUQABiABDIFEAAYgAQyBRAAGIAEMgUQABiABDIFEAAYgARI5FBQ9RdY10hwB3gBkAEAmAFroAH8EKoBBDE5LjS4AQHIAQD4AQGYAh6gAogTwgIKEAAYRxjWBBiwA8ICDRAAGIAEGIoFGEMYsAPCAg4QABjkAhjWBBiwA9gBAcICFxAuGNwGGLgGGNoGGNgCGMgDGLAD2AEBwgIKEAAYgAQYigUYQ8ICEBAAGIAEGIoFGEMYsQMYgwHCAggQABiABBixA8ICCxAAGIAEGLEDGIMBwgIEEAAYA8ICBxAAGIAEGArCAggQABiABBjJA8ICCBAAGIAEGJIDwgILEAAYgAQYigUYkgOYAwCIBgGQBhG6BgYIARABGAmSBwUxNC4xNqAHvYcBsgcENy4xNrgHwxLCBwYyLTIxLjnIB9EBgAgB&sclient=gws-wiz-serp" 
+                target="_blank" 
+                style="display: inline-block; margin: 10px 0; color: #0056b3; font-weight: bold; text-decoration: underline;">
+                🔍 Consultar tasa actual en Google
+            </a>
+            <div style="display: flex; justify-content: center; gap: 10px; align-items: center; margin-top: 10px;">
+                <label for="tasaManual" style="margin: 0;">1 USD = </label>
+                <input type="number" id="tasaManual" placeholder="Ej. 3.75" style="width: 100px; padding: 8px; text-align: center; border: 1px solid #ccc; border-radius: 6px;">
+                <span style="font-weight: bold; color: #333;">PEN</span>
             </div>
         </div>
 
-        <!-- Fila 2: Pesos -->
-        <div class="input-row">
-            <div class="input-group">
-                <label>PESO PAGADO (kg) - *Por definir*</label>
-                <input type="number" id="cp_pesoPagado" placeholder="Ej. 1.2" min="0">
-            </div>
-            <div class="input-group">
-                <label>NUEVO PESO (kg) - *Por definir*</label>
-                <input type="number" id="cp_pesoNuevo" placeholder="Ej. 2.1" min="0">
-            </div>
-        </div>
-
-        <!-- Botones centrados -->
-        <div class="acciones-form">
-            <button id="cp_btnCalcular" class="btn-rojo">CALCULAR</button>
-            <button id="cp_btnLimpiar" class="btn-blanco">LIMPIAR</button>
-        </div>
-
-        <!-- PLAN DE EMERGENCIA -->
-        <div id="cp_emergenciaAPI" class="alerta-emergencia" style="display: none;">
-            <p>⚠️ <b>¡El servidor de divisas no responde!</b></p>
-            <p>Ingresa el tipo de cambio del día manualmente.</p>
-            <a href="https://www.google.com/search?q=1+usd+a+pen" target="_blank" class="link-google">🔍 Consultar tasa actual en Google</a>
-            <div style="margin-top: 15px; display: flex; justify-content: center; gap: 10px; align-items: center;">
-                <label>1 USD = </label>
-                <input type="number" id="cp_tasaManual" placeholder="Ej. 3.75" style="width: 100px; padding: 5px; text-align: center;">
-                <span>PEN</span>
-            </div>
-        </div>
-
-        <!-- Resultados -->
-        <div id="cp_resultado" class="resultado-container" style="display: none;">
-            <p id="cp_infoTasa" class="texto-tasa">Cargando...</p>
-            
-            <div class="resumen-final">
-                <div class="linea-resultado">
-                    <span>Diferencia (Soles):</span>
-                    <strong id="cp_diffPen">0.00 PEN</strong>
-                </div>
-                <div class="linea-resultado highlight-usd">
-                    <span>Diferencia (Dólares):</span>
-                    <strong id="cp_diffUsd">0.00 USD</strong>
-                </div>
-            </div>
-
-            <div id="cp_veredicto" class="caja-veredicto">
-                <!-- Mensaje -->
-            </div>
-        </div>
+        <!-- Mensajes dinámicos y Resultados (Aquí se inyectarán los colores rojo y verde) -->
+        <div id="warn" class="warn" role="alert"></div>
+        <div id="resultado" class="result" style="text-align: left;"></div>
+      </form>
     </div>
+  </main>
 
-    <script src="cambiope.js"></script>
+  <!-- Script principal con la lógica matemática -->
+  <script src="cambiope.js"></script>
 </body>
 </html>

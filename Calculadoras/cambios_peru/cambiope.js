@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const TARIFA_PESO_USD = 21.99; // Tarifa por cada Kilo extra
     const PENALIDAD_12H_USD = 15.00; // Costo por gestión pasadas 12h
     const UMBRAL_IMPUESTOS = 200.00; // Límite en USD para cobro de impuestos
-    const TASA_IMPUESTOS = 0.25; // ACTUALIZADO: 25% para productos +200 USD
+    const TASA_IMPUESTOS = 0.25; // 25% para productos +200 USD
 
     // ==========================================
     // 📌 REFERENCIAS AL DOM
@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // ACTUALIZACIÓN: Multiplicador oculto del 1.069 sobre la cotización del día
+        // Multiplicador oculto del 1.069 sobre la cotización del día para el cálculo
         const tasaCambio = tasaCambioOriginal * 1.069;
 
         // 2. Variables para desglosar la cuenta (Todo en USD para estandarizar)
@@ -128,8 +128,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // 3. Totales Finales
         const totalCobroPEN = totalCobroUSD * tasaCambio;
 
-        // 4. Renderizar Resultado
-        let msjFinal = `<div style="font-size: 13px; color: #555; margin-bottom: 10px;">📊 Tasa de cambio aplicada: 1 USD = ${round2(tasaCambio)} PEN</div>`;
+        // 4. Renderizar Resultado (Muestra SOLO la tasa original de la API)
+        let msjFinal = `<div style="font-size: 13px; color: #555; margin-bottom: 10px;">📊 Tasa de cambio del día: 1 USD = ${round2(tasaCambioOriginal)} PEN</div>`;
         msjFinal += detalleHTML;
 
         if (totalCobroUSD > 0) {

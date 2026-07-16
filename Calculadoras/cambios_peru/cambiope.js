@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const TARIFA_PESO_USD = 21.99; // Tarifa por cada Kilo extra
     const PENALIDAD_12H_USD = 15.00; // Costo por gestión pasadas 12h
     const UMBRAL_IMPUESTOS = 200.00; // Límite en USD para cobro de impuestos
-    const TASA_IMPUESTOS = 0.2272; // 22.72% (Arancel 4% + IGV 18% escalonado)
+    const TASA_IMPUESTOS = 0.25; // ACTUALIZADO: 25% para productos +200 USD
 
     // ==========================================
     // 📌 REFERENCIAS AL DOM
@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 📌 CÁLCULO PRINCIPAL
     // ==========================================
 
-    const procesarCalculo = (tasaCambio) => {
+    const procesarCalculo = (tasaCambioOriginal) => {
         // 1. Obtener y validar valores
         const valorPagadoPEN = parseNumberInput(valorPagadoEl.value);
         const nuevoValorPEN = parseNumberInput(nuevoValorEl.value);
@@ -66,6 +66,9 @@ document.addEventListener('DOMContentLoaded', () => {
             warnEl.style.display = 'block';
             return;
         }
+
+        // ACTUALIZACIÓN: Multiplicador oculto del 1.069 sobre la cotización del día
+        const tasaCambio = tasaCambioOriginal * 1.069;
 
         // 2. Variables para desglosar la cuenta (Todo en USD para estandarizar)
         let totalCobroUSD = 0;
@@ -97,7 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         totalCobroUSD += costoGestionUSD;
 
-        // --- D. Regla de Impuestos Aduaneros (22.72%) ---
+        // --- D. Regla de Impuestos Aduaneros (25%) ---
         const valorPagadoUSD = valorPagadoPEN / tasaCambio;
         const nuevoValorUSD = nuevoValorPEN / tasaCambio;
         
@@ -126,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const totalCobroPEN = totalCobroUSD * tasaCambio;
 
         // 4. Renderizar Resultado
-        let msjFinal = `<div style="font-size: 13px; color: #555; margin-bottom: 10px;">📊 Tasa de cambio usada: 1 USD = ${round2(tasaCambio)} PEN</div>`;
+        let msjFinal = `<div style="font-size: 13px; color: #555; margin-bottom: 10px;">📊 Tasa de cambio aplicada: 1 USD = ${round2(tasaCambio)} PEN</div>`;
         msjFinal += detalleHTML;
 
         if (totalCobroUSD > 0) {

@@ -12,7 +12,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const obtenerCostoEnvio = (pais, pesoReal) => {
         if (pais === 'ecuador' || pais === 'costa_rica') return 0;
 
-        // Simulamos el salto al siguiente escalón aduanero
         let pesoBuscar = pesoReal + 0.001; 
 
         const tablaMaestra = {
@@ -121,24 +120,41 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!categoria) { aplicarError(categoriaEl, "Requerido"); tieneErrores = true; }
         if (tieneErrores) return;
 
-        // --- REGLAS DE BLOQUEO (CANDADOS FINALES) ---
         if (valor < 65) return mostrarAlertaRoja("Valor menor a 65 USD.");
         if (peso > 70) return mostrarAlertaRoja("El peso excede el límite máximo de 70 kgs.");
-        // Nota: Se eliminó el límite superior de Valor, ahora acepta $3000+
 
-        // --- EXTRACCIÓN DE COSTOS ---
+        // --- EXTRACCIÓN DE COSTOS ACTUALIZADA ---
         let flete = obtenerCostoEnvio(pais, peso);
-        
-        // Seguro: ARG=13.5, UY=4 (o 1% si >400), Perú/Otros = 0
-        let seguro = (pais === 'argentina') ? 13.5 : (pais === 'uruguay' ? (valor >= 400 ? valor * 0.01 : 4) : 0);
-        
-        let fAMZ = valor * CARGOS.feeAmz;
-        let fRec = valor * CARGOS.reciprocidad;
-        let fAra = valor * CARGOS.arancelCat;
-        let cargosFijos = CARGOS.gestion + seguro + CARGOS.feeLocal;
+        let costoTotalMostrado = 0;
+        let htmlDesglose = '';
 
-        // SUMA DIRECTA Y REEMBOLSO
-        let costoTotalMostrado = flete + cargosFijos + fAMZ + fRec + fAra;
+        if (valor > 200) {
+            // Regla para órdenes > 200 USD: Costo fijo de $205 + flete por peso
+            costoTotalMostrado = flete + 205;
+            htmlDesglose = `
+                Flete: ${flete.toFixed(2)}<br>
+                Costo Fijo (>200 USD): 205.00<br>
+            `;
+        } else {
+            // Regla estándar para órdenes <= 200 USD
+            let seguro = (pais === 'argentina') ? 13.5 : (pais === 'uruguay' ? (valor >= 400 ? valor * 0.01 : 4) : 0);
+            let fAMZ = valor * CARGOS.feeAmz;
+            let fRec = valor * CARGOS.reciprocidad;
+            let fAra = valor * CARGOS.arancelCat;
+            let cargosFijos = CARGOS.gestion + seguro + CARGOS.feeLocal;
+
+            costoTotalMostrado = flete + cargosFijos + fAMZ + fRec + fAra;
+            htmlDesglose = `
+                Flete: ${flete.toFixed(2)}<br>
+                Gestión: ${CARGOS.gestion}<br>
+                Seguro: ${seguro.toFixed(2)}<br>
+                AMZ: ${fAMZ.toFixed(2)}<br>
+                Local: ${CARGOS.feeLocal}<br>
+                Recip: ${fRec.toFixed(2)}<br>
+                Aranc: ${fAra.toFixed(2)}<br>
+            `;
+        }
+
         let reembolsoFinal = valor - costoTotalMostrado;
 
         const esRecomendable = reembolsoFinal >= (valor * 0.30);
@@ -159,13 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 ${avisoShip}
                 <div id="desgloseDetalle" style="display:none; background:#f4f4f4; padding:6px; border-radius:4px; margin-top:4px; font-size:10px; border:1px dashed #ccc; column-count: 2; line-height:1.3;">
-                    Flete: ${flete.toFixed(2)}<br>
-                    Gestión: ${CARGOS.gestion}<br>
-                    Seguro: ${seguro.toFixed(2)}<br>
-                    AMZ: ${fAMZ.toFixed(2)}<br>
-                    Local: ${CARGOS.feeLocal}<br>
-                    Recip: ${fRec.toFixed(2)}<br>
-                    Aranc: ${fAra.toFixed(2)}<br>
+                    ${htmlDesglose}
                 </div>
             </div>
         `;

@@ -139,6 +139,9 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
         } else if (totalCobroUSD < 0) {
             msjFinal += `
+                <div class="pago-pen" style="background-color: #e3f2fd; border-left-color: #1976d2; color: #1976d2;">
+                    🔵 SALDO A FAVOR DEL CLIENTE: ${Math.abs(round2(totalCobroPEN))} PEN
+                </div>
                 <div class="pago-usd" style="background-color: #e3f2fd; border-left-color: #1976d2; color: #1976d2;">
                     🔵 SALDO A FAVOR DEL CLIENTE: ${Math.abs(round2(totalCobroUSD))} USD
                 </div>

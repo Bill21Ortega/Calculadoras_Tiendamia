@@ -32,11 +32,13 @@
         <div class="field-group">
           <div class="field">
             <label for="pesoKgs">Peso (kgs)</label>
-            <input id="pesoKgs" type="text" placeholder="Número mayor a 0" required />
+            <!-- type="text" asegura que el navegador no bloquee las comas -->
+            <input id="pesoKgs" type="text" placeholder="Ej: 1.5 o 1,5" required />
           </div>
           <div class="field">
             <label for="valorProducto">Valor Producto (USD)</label>
-            <input id="valorProducto" type="text" placeholder="Número mayor a 0" required />
+            <!-- type="text" asegura que el navegador no bloquee las comas -->
+            <input id="valorProducto" type="text" placeholder="Ej: 170.50 o 170,50" required />
           </div>
         </div>
 
@@ -44,15 +46,18 @@
           <label for="categoria">Categoría de Producto</label>
           <select id="categoria" required>
             <option value="" disabled selected>Categoría</option>
-            <option value="ropa">Ropa, calzado y accesorios</option>
-            <option value="celulares">Celulares</option>
-            <option value="computadoras">Computadoras</option>
-            <option value="tecnologia">Tecnología</option>
-            <option value="relojes">Relojes y lentes</option>
-            <option value="deporte">Deporte y exteriores</option>
-            <option value="herramientas">Herramientas</option>
-            <option value="bebes">Bebés, niños y juegos</option>
-            <option value="hogar">Hogar y jardín</option>
+            <!-- IMPORTANTE: Los values ahora son el porcentaje decimal de cada arancel -->
+            <!-- Configuré Ropa en 20% (0.20) y el resto en 10% (0.10) como base. -->
+            <!-- ¡Verifica estos porcentajes con la planilla de Operaciones! -->
+            <option value="0.20">Ropa, calzado y accesorios</option>
+            <option value="0.10">Celulares</option>
+            <option value="0.10">Computadoras</option>
+            <option value="0.10">Tecnología</option>
+            <option value="0.10">Relojes y lentes</option>
+            <option value="0.10">Deporte y exteriores</option>
+            <option value="0.10">Herramientas</option>
+            <option value="0.10">Bebés, niños y juegos</option>
+            <option value="0.10">Hogar y jardín</option>
           </select>
         </div>
 

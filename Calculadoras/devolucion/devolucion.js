@@ -4,7 +4,6 @@ document.addEventListener('DOMContentLoaded', () => {
         gestion: 1.79, 
         feeAmz: 0.03, 
         feeLocal: 5
-        // Eliminados: reciprocidad y arancelCat fijo, ya que ahora son dinámicos o nulos
     };
 
     // 2. FUNCIÓN DE FLETE (Tabla completa hasta 70kg)
@@ -122,54 +121,39 @@ document.addEventListener('DOMContentLoaded', () => {
         if (valor < 65) return mostrarAlertaRoja("Valor menor a 65 USD.");
         if (peso > 70) return mostrarAlertaRoja("El peso excede el límite máximo de 70 kgs.");
 
-        // --- EXTRACCIÓN DE COSTOS ACTUALIZADA ---
+        // --- EXTRACCIÓN DE COSTOS ---
         let fleteBase = obtenerCostoEnvio(pais, peso);
         
-        // Regla 1: Fuel Surcharge (36% solo para AR)
+        // Fuel Surcharge (36% solo para AR)
         let fuelSurcharge = (pais === 'argentina') ? (fleteBase * 0.36) : 0;
         let fleteTotal = fleteBase + fuelSurcharge;
 
-        let costoTotalMostrado = 0;
-        let htmlDesglose = '';
+        // Seguro (1% si >400, sino tarifa plana base)
+        let seguro = (valor > 400) ? (valor * 0.01) : (pais === 'argentina' ? 13.5 : (pais === 'uruguay' ? 4 : 0));
+        
+        let fAMZ = valor * CARGOS.feeAmz;
+        
+        // Arancel dinámico extraído del select de categoría (fallback a 10% si falla)
+        let arancelPorcentaje = parseFloat(categoria) || 0.10;
+        let fAra = valor * arancelPorcentaje;
+        
+        // Fee Importación US (Solo AR)
+        let feeImpUS = (pais === 'argentina') ? 25.00 : 0;
+        
+        let cargosFijos = CARGOS.gestion + seguro + CARGOS.feeLocal + feeImpUS;
 
-        if (valor > 200) {
-            // Regla para órdenes > 200 USD: Costo fijo de $205 + flete (incluyendo fuel surcharge)
-            costoTotalMostrado = fleteTotal + 205;
-            htmlDesglose = `
-                Flete Base: ${fleteBase.toFixed(2)}<br>
-                Fuel Surch.: ${fuelSurcharge.toFixed(2)}<br>
-                Costo Fijo (>200 USD): 205.00<br>
-            `;
-        } else {
-            // Regla estándar para órdenes <= 200 USD
-            
-            // Seguro (1% si >400, sino tarifa plana base)
-            let seguro = (valor > 400) ? (valor * 0.01) : (pais === 'argentina' ? 13.5 : (pais === 'uruguay' ? 4 : 0));
-            
-            let fAMZ = valor * CARGOS.feeAmz;
-            
-            // Arancel dinámico extraído del select de categoría (fallback a 10% si falla)
-            let arancelPorcentaje = parseFloat(categoria) || 0.10;
-            let fAra = valor * arancelPorcentaje;
-            
-            // Fee Importación US (Solo AR)
-            let feeImpUS = (pais === 'argentina') ? 25.00 : 0;
-            
-            let cargosFijos = CARGOS.gestion + seguro + CARGOS.feeLocal + feeImpUS;
-
-            costoTotalMostrado = fleteTotal + cargosFijos + fAMZ + fAra;
-            
-            htmlDesglose = `
-                Flete Base: ${fleteBase.toFixed(2)}<br>
-                Fuel Surch.: ${fuelSurcharge.toFixed(2)}<br>
-                Gestión: ${CARGOS.gestion}<br>
-                Seguro: ${seguro.toFixed(2)}<br>
-                AMZ: ${fAMZ.toFixed(2)}<br>
-                Local: ${CARGOS.feeLocal}<br>
-                Fee Imp US: ${feeImpUS.toFixed(2)}<br>
-                Aranc. Cat: ${fAra.toFixed(2)}<br>
-            `;
-        }
+        let costoTotalMostrado = fleteTotal + cargosFijos + fAMZ + fAra;
+        
+        let htmlDesglose = `
+            Flete Base: ${fleteBase.toFixed(2)}<br>
+            Fuel Surch.: ${fuelSurcharge.toFixed(2)}<br>
+            Gestión: ${CARGOS.gestion}<br>
+            Seguro: ${seguro.toFixed(2)}<br>
+            AMZ: ${fAMZ.toFixed(2)}<br>
+            Local: ${CARGOS.feeLocal}<br>
+            Fee Imp US: ${feeImpUS.toFixed(2)}<br>
+            Aranc. Cat: ${fAra.toFixed(2)}<br>
+        `;
 
         let reembolsoFinal = valor - costoTotalMostrado;
 

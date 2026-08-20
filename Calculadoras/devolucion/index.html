@@ -32,12 +32,10 @@
         <div class="field-group">
           <div class="field">
             <label for="pesoKgs">Peso (kgs)</label>
-            <!-- type="text" asegura que el navegador no bloquee las comas -->
             <input id="pesoKgs" type="text" placeholder="Ej: 1.5 o 1,5" required />
           </div>
           <div class="field">
             <label for="valorProducto">Valor Producto (USD)</label>
-            <!-- type="text" asegura que el navegador no bloquee las comas -->
             <input id="valorProducto" type="text" placeholder="Ej: 170.50 o 170,50" required />
           </div>
         </div>
@@ -46,9 +44,6 @@
           <label for="categoria">Categoría de Producto</label>
           <select id="categoria" required>
             <option value="" disabled selected>Categoría</option>
-            <!-- IMPORTANTE: Los values ahora son el porcentaje decimal de cada arancel -->
-            <!-- Configuré Ropa en 20% (0.20) y el resto en 10% (0.10) como base. -->
-            <!-- ¡Verifica estos porcentajes con la planilla de Operaciones! -->
             <option value="0.20">Ropa, calzado y accesorios</option>
             <option value="0.10">Celulares</option>
             <option value="0.10">Computadoras</option>
@@ -66,8 +61,8 @@
           <button type="button" id="limpiarDev" class="ghost">Limpiar</button>
         </div>
 
-        <div id="warnDev" class="warn" role="alert"></div>
-        <div id="resultadoDev" class="result"></div>
+        <div id="warnDev" class="warn" role="alert" style="display: none;"></div>
+        <div id="resultadoDev" class="result" style="display: none;"></div>
 
         <p style="font-size: 11px; color: #777; margin-top: 15px; line-height: 1.4;">
           <strong>Importante:</strong> El valor indicado es un estimado. El costo final puede variar según el courier, peso/medidas verificados y normativa aduanera aplicable.

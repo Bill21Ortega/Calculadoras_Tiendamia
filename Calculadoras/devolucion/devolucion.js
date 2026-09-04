@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 2. FUNCIÓN DE FLETE (Tabla completa hasta 70kg)
     const obtenerCostoEnvio = (pais, pesoReal) => {
-        // ACTUALIZACIÓN: Se quita Costa Rica de aquí, ya que ahora sí tiene tabla de cobro.
+        // Ecuador se mantiene sin flete (cargo cliente)
         if (pais === 'ecuador') return 0;
 
         let pesoBuscar = pesoReal + 0.001; 
@@ -35,7 +35,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 [21, 246.00], [22, 252.50], [23, 259.01], [24, 265.52], [25, 272.02], [26, 278.53], [27, 285.04], [28, 291.55], [29, 298.05], [30, 304.56],
                 [40, 425.02], [50, 551.28], [60, 677.54], [70, 803.80]
             ],
-            // ACTUALIZACIÓN: Se agrega la tabla completa de Costa Rica
             'costa_rica': [
                 [0.5, 31.45], [1, 34.45], [1.5, 34.45], [2, 37.46], [2.5, 38.98], [3, 41.83], [3.5, 44.45], [4, 47.07], [4.5, 49.70], [5, 52.32],
                 [5.5, 60.82], [6, 67.54], [6.5, 74.27], [7, 80.99], [7.5, 87.72], [8, 94.44], [8.5, 101.17], [9, 107.89], [9.5, 114.62], [10, 121.34],
@@ -134,33 +133,32 @@ document.addEventListener('DOMContentLoaded', () => {
         if (valor < 65) return mostrarAlertaRoja("Valor menor a 65 USD.");
         if (peso > 70) return mostrarAlertaRoja("El peso excede el límite máximo de 70 kgs.");
 
-        // --- EXTRACCIÓN DE COSTOS (ACTUALIZADA) ---
+        // --- EXTRACCIÓN DE COSTOS ---
         let fleteBase = obtenerCostoEnvio(pais, peso);
         
-        // ACTUALIZACIÓN: Fuel Surcharge (36% ahora para todos los países)
+        // Fuel Surcharge (36% para todos los países)
         let fuelSurcharge = fleteBase * 0.36;
         let fleteTotal = fleteBase + fuelSurcharge;
 
-        // ACTUALIZACIÓN: Seguro (UY pasó de 4 a 6. El resto sigue igual)
+        // Seguro
         let seguro = (valor > 400) ? (valor * 0.01) : (pais === 'argentina' ? 13.5 : (pais === 'uruguay' ? 6 : 0));
         
         let fAMZ = valor * CARGOS.feeAmz;
         
-        // Arancel dinámico extraído del select de categoria (HTML debe tener values 0.20 y 0.10)
+        // Arancel dinámico
         let arancelPorcentaje = parseFloat(categoria) || 0.10;
         let fAra = valor * arancelPorcentaje;
         
-        // ACTUALIZACIÓN: Fee Importación US (AR=25, Resto de países=18)
+        // Fee Importación US
         let feeImpUS = (pais === 'argentina') ? 25.00 : 18.00;
 
-        // ACTUALIZACIÓN: Castigo de Exportación Uruguay (Solo si es UY y > $200)
-        let feeExpUY = (pais === 'uruguay' && valor > 200) ? 167.00 : 0;
+        // Castigo de Exportación Uruguay (Confirmado en 205 USD)
+        let feeExpUY = (pais === 'uruguay' && valor > 200) ? 205.00 : 0;
         
         let cargosFijos = CARGOS.gestion + seguro + CARGOS.feeLocal + feeImpUS + feeExpUY;
 
         let costoTotalMostrado = fleteTotal + cargosFijos + fAMZ + fAra;
         
-        // ACTUALIZACIÓN: Mostrar el feeExpUY en el desglose solo si aplica
         let htmlDesglose = `
             Flete Base: ${fleteBase.toFixed(2)}<br>
             Fuel Surch.: ${fuelSurcharge.toFixed(2)}<br>
@@ -175,15 +173,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let reembolsoFinal = valor - costoTotalMostrado;
 
-        // ACTUALIZACIÓN: Operaciones cambió la regla de "Recomendable". Ahora es: Reembolso > Costo
-        const esRecomendable = reembolsoFinal > costoTotalMostrado;
+        // ACTUALIZACIÓN: Regla de Rentabilidad (Reembolso mayor a 0)
+        const esRentable = reembolsoFinal > 0;
         const colorClase = reembolsoFinal >= 0 ? 'text-positive' : 'text-negative';
         
-        // ACTUALIZACIÓN: Solo Ecuador se queda con el aviso de cargo cliente
+        // Solo Ecuador lleva el aviso de cargo cliente
         let avisoShip = (pais === 'ecuador') ? 
             '<small style="color:#d9534f; display:block; font-size:11px; margin-top:2px;">⚠️ Envío cargo cliente</small>' : '';
 
-        // UI COMPACTA (Intacta)
+        // UI COMPACTA
         resultadoEl.innerHTML = `
             <div style="border-top:1px solid #ddd; margin-top:6px; padding-top:6px; font-size:13px;">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 2px;">
@@ -191,7 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span>Reembolso: <b class="${colorClase}">${reembolsoFinal.toFixed(2)} USD</b></span>
                 </div>
                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span>Sugerencia: ${esRecomendable ? '<b style="color:green">✅ Recomendable</b>' : '<b style="color:red">❌ No Recomendable</b>'}</span>
+                    <span>Sugerencia: ${esRentable ? '<b style="color:green">✅ Rentable</b>' : '<b style="color:red">❌ No Rentable</b>'}</span>
                     <button id="toggleDesglose" type="button" style="background:none; border:none; color:#007bff; cursor:pointer; font-size:11px; text-decoration:underline; padding:0;">Ver Detalles</button>
                 </div>
                 ${avisoShip}

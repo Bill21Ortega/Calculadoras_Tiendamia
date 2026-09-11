@@ -56,12 +56,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const procesarCalculo = (tasaCambioOriginal) => {
         // 1. Obtener y validar valores
-        const valorPagadoPEN = parseNumberInput(valorPagadoEl.value);
-        const nuevoValorPEN = parseNumberInput(nuevoValorEl.value);
+        const valorPagadoUSD = parseNumberInput(valorPagadoEl.value); // AHORA EN DÓLARES
+        const nuevoValorPEN = parseNumberInput(nuevoValorEl.value);   // SIGUE EN SOLES
         const pesoPagado = parseNumberInput(pesoPagadoEl.value);
         const nuevoPeso = parseNumberInput(nuevoPesoEl.value);
 
-        if (valorPagadoPEN === null || nuevoValorPEN === null || pesoPagado === null || nuevoPeso === null) {
+        if (valorPagadoUSD === null || nuevoValorPEN === null || pesoPagado === null || nuevoPeso === null) {
             warnEl.innerHTML = '⚠️ Por favor, ingresa números válidos en todos los campos.';
             warnEl.style.display = 'block';
             return;
@@ -74,9 +74,10 @@ document.addEventListener('DOMContentLoaded', () => {
         let totalCobroUSD = 0;
         let detalleHTML = '';
 
-        // --- A. Diferencia de Precio del Producto ---
-        const diferenciaPrecioPEN = nuevoValorPEN - valorPagadoPEN;
-        const diferenciaPrecioUSD = diferenciaPrecioPEN / tasaCambio;
+        // --- A. Diferencia de Precio del Producto (Cruce de monedas) ---
+        const nuevoValorUSD = nuevoValorPEN / tasaCambio; // Convertimos el nuevo a USD
+        const diferenciaPrecioUSD = nuevoValorUSD - valorPagadoUSD; // Restamos peras con peras (USD con USD)
+        
         totalCobroUSD += diferenciaPrecioUSD;
 
         detalleHTML += `<div class="detalle-calc">📦 <b>Dif. de Producto:</b> ${diferenciaPrecioUSD > 0 ? '+' : ''}${round2(diferenciaPrecioUSD)} USD</div>`;
@@ -101,9 +102,6 @@ document.addEventListener('DOMContentLoaded', () => {
         totalCobroUSD += costoGestionUSD;
 
         // --- D. Regla de Impuestos Aduaneros (25%) ---
-        const valorPagadoUSD = valorPagadoPEN / tasaCambio;
-        const nuevoValorUSD = nuevoValorPEN / tasaCambio;
-        
         let impuestoUSD = 0;
 
         if (valorPagadoUSD < UMBRAL_IMPUESTOS && nuevoValorUSD >= UMBRAL_IMPUESTOS) {

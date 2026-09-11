@@ -16,17 +16,17 @@
     <div class="content">
       <h1>🧮 CAMBIO DE PRODUCTO PERÚ 🧮</h1>
       <p class="helper">
-        Ingresa los valores y pesos en Soles (PEN) y Kilos (kg). Si pasaron más de 12h, marca la casilla para sumar el costo de gestión automático.
+        Ingresa el valor original en Dólares (USD), el nuevo en Soles (PEN) y los pesos en Kilos (kg). Si pasaron más de 12h, marca la casilla para sumar el costo de gestión automático.
       </p>
 
       <!-- Formulario principal -->
       <form id="calcCambioForm" novalidate>
         
-        <!-- Fila 1: Valores en Soles -->
+        <!-- Fila 1: Valores en Dólares y Soles -->
         <div class="field-group">
           <div class="field">
-            <label for="valorPagado">VALOR PAGADO (PEN)</label>
-            <input id="valorPagado" type="text" placeholder="Ej. 150.00" required />
+            <label for="valorPagado">VALOR PAGADO (USD)</label>
+            <input id="valorPagado" type="text" placeholder="Ej. 50.00" required />
           </div>
           <div class="field">
             <label for="nuevoValor">NUEVO VALOR (PEN)</label>
@@ -64,7 +64,7 @@
         <div id="emergenciaAPI" class="warn" style="display: none; text-align: center; margin-top: 15px;">
             <p style="margin-top: 0;">⚠️ <b>¡El servidor de divisas no responde!</b></p>
             <p>Ingresa el tipo de cambio del día manualmente para continuar.</p>
-            <a href="https://www.google.com/search?q=cambio+de+dolares+a+soles+peruanos&sca_esv=7f18ccfbdad134d1&rlz=1C1GCEA_enCO1160CO1161&sxsrf=APpeQnt_8C4Inr02atP8gL-FUq43VBdxmg%3A1784135866697&ei=usBXaqaRKtiDwbkP_YmJ4QQ&biw=1707&bih=811&oq=cambio+de+dolares+a+soles+&gs_lp=Egxnd3Mtd2l6LXNlcnAiGmNhbWJpbyBkZSBkb2xhcmVzIGEgc29sZXMgKgIIADIFEAAYgAQyBRAAGIAEMgUQABiABDIFEAAYgAQyBRAAGIAEMgUQABiABDIFEAAYgAQyBRAAGIAEMgUQABiABDIFEAAYgARI5FBQ9RdY10hwB3gBkAEAmAFroAH8EKoBBDE5LjS4AQHIAQD4AQGYAh6gAogTwgIKEAAYRxjWBBiwA8ICDRAAGIAEGIoFGEMYsAPCAg4QABjkAhjWBBiwA9gBAcICFxAuGNwGGLgGGNoGGNgCGMgDGLAD2AEBwgIKEAAYgAQYigUYQ8ICEBAAGIAEGIoFGEMYsQMYgwHCAggQABiABBixA8ICCxAAGIAEGLEDGIMBwgIEEAAYA8ICBxAAGIAEGArCAggQABiABBjJA8ICCBAAGIAEGJIDwgILEAAYgAQYigUYkgOYAwCIBgGQBhG6BgYIARABGAmSBwUxNC4xNqAHvYcBsgcENy4xNrgHwxLCBwYyLTIxLjnIB9EBgAgB&sclient=gws-wiz-serp" 
+            <a href="https://www.google.com/search?q=cambio+de+dolares+a+soles+peruanos" 
                 target="_blank" 
                 style="display: inline-block; margin: 10px 0; color: #0056b3; font-weight: bold; text-decoration: underline;">
                 🔍 Consultar tasa actual en Google
@@ -76,7 +76,7 @@
             </div>
         </div>
 
-        <!-- Mensajes dinámicos y Resultados (Aquí se inyectarán los colores rojo y verde) -->
+        <!-- Mensajes dinámicos y Resultados -->
         <div id="warn" class="warn" role="alert"></div>
         <div id="resultado" class="result" style="text-align: left;"></div>
       </form>

@@ -1,7 +1,12 @@
-// ---- CONFIGURACIÓN MANUAL DE PROTESTAS O PAROS ----
-// Si hay una huelga o feriado imprevisto, agrégalo aquí entre comillas y separado por comas.
-// Ejemplo: ["2026-10-15", "2026-11-03"]
-const FERIADOS_EXTRA_MANUALES = [];
+// ---- CONFIGURACIÓN MANUAL DE PROTESTAS O PAROS POR PAÍS ----
+// Agrega la fecha "YYYY-MM-DD" entre comillas dentro de los corchetes del país afectado.
+const FERIADOS_EXTRA_MANUALES = {
+    "Uruguay": [],
+    "Costa Rica": [],
+    "Peru": [],
+    "Ecuador": [],
+    "Argentina": []
+};
 
 // Códigos de país para la API pública (Nager.Date)
 const COUNTRY_CODES = {
@@ -58,8 +63,9 @@ async function calcularEntrega(pais, fechaCompraStr, diasHabiles) {
     const feriadosAnio1 = await obtenerFeriadosAPI(pais, anioCompra);
     const feriadosAnio2 = await obtenerFeriadosAPI(pais, anioCompra + 1);
 
-    // 2. Unimos los feriados de la API con tus fechas manuales
-    const todosLosFeriados = new Set([...feriadosAnio1, ...feriadosAnio2, ...FERIADOS_EXTRA_MANUALES]);
+    // 2. Unimos los feriados de la API con tus fechas manuales SOLO del país seleccionado
+    const feriadosManualesPais = FERIADOS_EXTRA_MANUALES[pais] || [];
+    const todosLosFeriados = new Set([...feriadosAnio1, ...feriadosAnio2, ...feriadosManualesPais]);
 
     let restantes = diasHabiles;
 
